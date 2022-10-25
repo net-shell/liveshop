@@ -31,7 +31,7 @@ class SourceResource extends Resource
                 Forms\Components\Select::make('content_type')
                     ->options([
                         'categories' => 'Categories',
-                        'list_products' => 'List Products',
+                        'products' => 'List Products',
                         'product' => 'Product',
                     ])
                     ->required(),
