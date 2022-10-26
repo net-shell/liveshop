@@ -24,7 +24,7 @@
             a {
                 color: #CF0;
             }
-            
+
             .noselect {
                 -webkit-touch-callout: none;
                 -webkit-user-select: none;
@@ -68,22 +68,33 @@
                 width: 100%;
             }
 
-            .layout > * {
-                overflow-y: auto;
-            }
-
-            .layout nav {
-                background-color: #111;
+            nav {
+                background-color: #000;
+                flex: 1;
             }
 
             .rounded {
-                margin: 1rem;
+                margin: .8rem;
                 border: 1px solid #ccc;
                 border-radius: .2rem;
-                padding: .2rem .4rem;
+                padding: .2rem;
             }
 
-            .layout > .cats, .flex-head .name {
+            .btn {
+                display: block;
+                padding: .4rem .8rem;
+                cursor: pointer;
+            }
+
+            .btn:hover {
+                background-color: rgba(255, 255, 255, .25);
+            }
+
+            .panel {
+                overflow-y: auto;
+            }
+
+            .layout .cats, .flex-head .name {
                 flex: 1 1 0%;
             }
 
@@ -99,13 +110,18 @@
                 background-color: #555;
             }
 
-            .layout > .prods {
+            .cats.empty {
+                background-color: #666;
+                color: #fff;
+            }
+
+            .prods {
                 background-color: #eee;
                 color: #333;
                 flex: 1 0 50%;
             }
 
-            .layout > .prods .title {
+            .prods .title {
                 background-color: #888;
                 color: #fff;
                 text-align: center;
@@ -113,10 +129,14 @@
                 padding: 1rem;
             }
 
-            .layout > .prods .price {
+            .prods .price {
                 color: #f30;
                 text-align: right;
                 flex: none;
+            }
+
+            .prods .info {
+                background-color: #ddd;
             }
 
             .flex-2, .flex-head {
@@ -138,16 +158,6 @@
             .flex-head:hover {
                 background-color: #CF0;
             }
-
-            .btn {
-                display: block;
-                padding: .5rem 1rem;
-                cursor: pointer;
-            }
-
-            .btn:hover {
-                background-color: rgba(255, 255, 255, .25);
-            }
         </style>
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
@@ -158,6 +168,7 @@
                 cats: {},
                 cats2: {},
                 cats3: {},
+                empty: false,
                 title: null,
                 prods: [],
                 getCats(url) {
@@ -175,17 +186,18 @@
                     if (!url) return;
                     this.title = title;
                     this.loading = true;
+                    this.empty = false;
                     fetch(url)
                         .then((response) => response.json())
                         .then((json) => this.prods = json)
-                        .finally(() => { this.loading = false; if (!this.prods.length) alert('В тази категория няма продукти.'); });
+                        .finally(() => { this.loading = false; this.empty = !this.prods.length; });
                 },
             }" x-init="getCats('{{ $sources->first()->local_api_url }}');">
             <div class="loading noselect" x-show="loading">
                 <span class="rounded">ЗАРЕЖДАНЕ...</span>
             </div>
-            <div class="flex-col">
-                <nav class="flex-row">
+            <div class="flex-col panel">
+                <nav class="flex-row" tabindex="-1">
                     <a class="btn" href="https://netshell.bg/" target="_blank">НЕТШЕЛ</a>
                     <a class="btn" href="{{ url('/') }}">{{ env('APP_NAME') }}</a>
                     @foreach ($sources as $source)
@@ -195,31 +207,36 @@
                     @endforeach
                 </nav>
                 <div class="flex-row" tabindex="0">
-                    <div class="cats">
+                    <div class="cats" tabindex="0">
                         <template x-for="(cat, c1) in cats">
-                            <a class="btn" :class="{ 'rounded': cat === cats2 }" x-text="c1" x-on:click="cats2 = cat; cats3 = {}; prods = []; title = null;" tabindex="-1"></a>
+                            <a class="btn" :class="{ 'rounded': cat === cats2 }" x-text="c1" x-on:click="cats2 = cat; cats3 = {}; prods = []; title = null;" tabindex="1"></a>
                         </template>
                     </div>
-                    <div class="cats cat2" x-show="hasCats2()">
+                    <div class="cats cat2" x-show="hasCats2()" tabindex="0">
                         <template x-for="(cat, c2) in cats2">
-                            <a class="btn" :class="{ 'rounded': cat === cats3 }" x-text="c2" x-on:click="cats3 = cat; prods = []; title = null;" tabindex="-1"></a>
+                            <a class="btn" :class="{ 'rounded': cat === cats3 }" x-text="c2" x-on:click="cats3 = cat; prods = []; title = null;" tabindex="0"></a>
                         </template>
                     </div>
-                    <div class="cats cat3" x-show="hasCats3()">
+                    <div class="cats cat3" x-show="hasCats3()" tabindex="0">
                         <template x-for="(url, c3) in cats3">
-                            <a class="btn" :class="{ 'rounded': c3 === title }" x-text="c3" x-on:click="getProds(c3, url)" tabindex="-1"></a>
+                            <a class="btn" :class="{ 'rounded': c3 === title }" x-text="c3" x-on:click="getProds(c3, url)" tabindex="0"></a>
                         </template>
+                    </div>
+                    <div class="cats empty" x-show="empty">
+                        <div class="rounded noselect">
+                            <b>В тази категория няма продукти.</b>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="prods" x-show="!!prods.length" tabindex="0">
+            <div class="panel prods" x-show="!!prods.length" tabindex="0">
                 <h3 class="title noselect">
                     <span x-text="title"></span>
                     (<b x-text="prods.length"></b>)
                 </h3>
                 <template x-for="prod in prods">
                     <div :class="{ 'rounded': expanded }" x-data="{ expanded: false }">
-                        <div class="flex-head" @click="expanded = !expanded" tabindex="-1">
+                        <div class="flex-head" @click="expanded = !expanded" tabindex="0">
                             <div class="name">
                                 <b x-text="prod.name"></b>
                             </div>
@@ -228,7 +245,7 @@
                                 <span x-text="prod.currency"></span>
                             </div>
                         </div>
-                        <div x-show="expanded">
+                        <div class="info" x-show="expanded">
                             <div class="flex-2">
                                 <div>
                                     Гаранция:

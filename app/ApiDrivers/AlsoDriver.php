@@ -46,6 +46,7 @@ class AlsoDriver
             foreach ($product->childNodes as $prop) {
                 $value = $prop->nodeValue;
                 if ($prop->localName === 'price') {
+                    if (0 === (float)$value) continue;
                     $value = number_format((float)$value, 2, '.', '');
                     $result['currency'] = $prop->getAttribute('currency');
                 }
