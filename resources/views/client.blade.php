@@ -48,26 +48,32 @@
                 align-items: center;
             }
 
-            .layout {
+            .layout, .flex-row {
                 display: flex;
+                flex-direction: row;
                 justify-content: stretch;
+                width: 100%;
                 height: 100%;
+            }
+
+            @media (max-width: 800px) {
+                .layout {
+                    flex-direction: column;
+                }
+            }
+
+            .flex-col {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
             }
 
             .layout > * {
                 overflow-y: auto;
             }
 
-            .layout > nav {
-                flex: none;
+            .layout nav {
                 background-color: #111;
-                padding-top: 1rem;
-            }
-
-            .layout > nav ul {
-                margin: 0;
-                padding: 0 0 0 1.5rem;
-                list-style: none;
             }
 
             .rounded {
@@ -96,7 +102,7 @@
             .layout > .prods {
                 background-color: #eee;
                 color: #333;
-                flex: 50%;
+                flex: 1 0 50%;
             }
 
             .layout > .prods .title {
@@ -178,45 +184,33 @@
             <div class="loading noselect" x-show="loading">
                 <span class="rounded">ЗАРЕЖДАНЕ...</span>
             </div>
-            <nav>
-                <ul style="padding: 0;">
-                    <li>
-                        <a class="btn" href="https://netshell.bg/" target="_blank">
-                            НЕТШЕЛ
-                        </a>
-                        <ul>
-                            <li>
-                                <a class="btn" href="{{ url('/') }}">
-                                    {{ env('APP_NAME') }}
-                                </a>
-                                <ul>
-                                    @foreach ($sources as $source)
-                                    <li x-data="{ loadSource() { getCats('{{ $source->local_api_url }}'); }, }">
-                                        <a class="btn" @click="loadSource()" @keyup.enter="loadSource()" href="#">
-                                            {{ $source->name }}
-                                        </a>
-                                    </li>
-                                    @endforeach
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-            <div class="cats">
-                <template x-for="(cat, c1) in cats">
-                    <a class="btn" :class="{ 'rounded': cat === cats2 }" x-text="c1" x-on:click="cats2 = cat; cats3 = {}; prods = []; title = null;"></a>
-                </template>
-            </div>
-            <div class="cats cat2" x-show="hasCats2()">
-                <template x-for="(cat, c2) in cats2">
-                    <a class="btn" :class="{ 'rounded': cat === cats3 }" x-text="c2" x-on:click="cats3 = cat; prods = []; title = null;"></a>
-                </template>
-            </div>
-            <div class="cats cat3" x-show="hasCats3()">
-                <template x-for="(url, c3) in cats3">
-                    <a class="btn" :class="{ 'rounded': c3 === title }" x-text="c3" x-on:click="getProds(c3, url)"></a>
-                </template>
+            <div class="flex-col">
+                <nav class="flex-row">
+                    <a class="btn" href="https://netshell.bg/" target="_blank">НЕТШЕЛ</a>
+                    <a class="btn" href="{{ url('/') }}">{{ env('APP_NAME') }}</a>
+                    @foreach ($sources as $source)
+                    <a class="btn" @click="getCats('{{ $source->local_api_url }}')" href="#">
+                        {{ $source->name }}
+                    </a>
+                    @endforeach
+                </nav>
+                <div class="flex-row">
+                    <div class="cats">
+                        <template x-for="(cat, c1) in cats">
+                            <a class="btn" :class="{ 'rounded': cat === cats2 }" x-text="c1" x-on:click="cats2 = cat; cats3 = {}; prods = []; title = null;"></a>
+                        </template>
+                    </div>
+                    <div class="cats cat2" x-show="hasCats2()">
+                        <template x-for="(cat, c2) in cats2">
+                            <a class="btn" :class="{ 'rounded': cat === cats3 }" x-text="c2" x-on:click="cats3 = cat; prods = []; title = null;"></a>
+                        </template>
+                    </div>
+                    <div class="cats cat3" x-show="hasCats3()">
+                        <template x-for="(url, c3) in cats3">
+                            <a class="btn" :class="{ 'rounded': c3 === title }" x-text="c3" x-on:click="getProds(c3, url)"></a>
+                        </template>
+                    </div>
+                </div>
             </div>
             <div class="prods" x-show="!!prods.length">
                 <h3 class="title noselect">
