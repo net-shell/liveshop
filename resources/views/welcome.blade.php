@@ -23,23 +23,27 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-            }
-
-            .h-full {
                 height: 100%;
             }
 
-            code {
+            .btn {
                 border: 1px solid #ccc;
                 border-radius: .2rem;
-                padding: .2rem .4rem;
+                padding: 1rem;
+                color: #fff;
+                font-size: 2em;
+                text-decoration: none;
+            }
+
+            .btn:hover {
+                background-color: rgba(255, 255, 255, .25);
             }
         </style>
     </head>
     <body>
-        <div class="h-full flex-center">
+        <div class="flex-center">
             <div>
-                <code>LiveShop</code>
+                <a class="btn" href="{{ route('client') }}">Каталог</a>
             </div>
         </div>
     </body>

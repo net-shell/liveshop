@@ -11,10 +11,9 @@ class AlsoDriver
 
     public function __construct(protected Source $source)
     {
-        $response = $source->fetchApiUrl();
-        //dd($response);
+        $xml = $source->fetchApiUrl();
         $this->dom = new DOMDocument;
-        $this->dom->loadXML($response);
+        $this->dom->loadXML($xml);
     }
 
     public function categories()
@@ -45,10 +44,12 @@ class AlsoDriver
                 $result[$attr->nodeName] = $attr->value;
             }
             foreach ($product->childNodes as $prop) {
-                $result[$prop->localName] = $prop->nodeValue;
+                $value = $prop->nodeValue;
                 if ($prop->localName === 'price') {
+                    $value = number_format((float)$value, 2, '.', '');
                     $result['currency'] = $prop->getAttribute('currency');
                 }
+                $result[$prop->localName] = $value;
             }
             $products[] = $result;
         }
@@ -56,5 +57,10 @@ class AlsoDriver
         array_multisort(array_column($products, 'price'), SORT_ASC, $products);
 
         return $products;
+    }
+
+    public function product()
+    {
+
     }
 }
