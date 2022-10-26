@@ -13,14 +13,22 @@ class Source extends Model
 
     protected $fillable = ['name', 'slug', 'content_type', 'api_url'];
     protected $apiCacheTime = 3600 * 24;
+    protected $apiDriver;
 
     public function apiDriver()
     {
-        return new AlsoDriver($this);
+        if (!$this->apiDriver) {
+            $this->apiDriver = new AlsoDriver($this);
+        }
+        return $this->apiDriver;
     }
 
     public function apiData()
     {
+        $error = $this->apiDriver()->error;
+        if ($error) {
+            return compact('error');
+        }
         return $this->apiDriver()->{$this->content_type}();
     }
 

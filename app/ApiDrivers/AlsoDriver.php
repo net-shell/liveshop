@@ -7,6 +7,8 @@ use DOMDocument;
 
 class AlsoDriver
 {
+    public $error;
+
     protected $dom;
 
     public function __construct(protected Source $source)
@@ -14,6 +16,11 @@ class AlsoDriver
         $xml = $source->fetchApiUrl();
         $this->dom = new DOMDocument;
         $this->dom->loadXML($xml);
+
+        $error = $this->dom->getElementsByTagName('error');
+        if ($error && $error->item(0)) {
+            $this->error = $error->item(0)->nodeValue;
+        }
     }
 
     public function categories()

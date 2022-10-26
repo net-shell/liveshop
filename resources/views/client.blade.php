@@ -177,7 +177,7 @@
                     this.loading = true;
                     fetch(apiSrc)
                         .then((response) => response.json())
-                        .then((json) => this.cats = json)
+                        .then((json) => { if (json.error) { alert(json.error); } else { this.cats = json; } })
                         .finally(() => { this.loading = false; this.cats2 = {}; this.cats3 = {}; this.prods = []; this.title = null; });
                 },
                 hasCats2() { return !!Object.keys(this.cats2).length; },
