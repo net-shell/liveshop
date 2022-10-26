@@ -53,6 +53,8 @@ class AlsoDriver
             $products[] = $result;
         }
 
+        array_multisort(array_column($products, 'price'), SORT_ASC, $products);
+
         return $products;
     }
 }
