@@ -7,6 +7,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/client', function () {
+    $sources = App\Models\Source::all();
+    return view('client', compact('sources'));
+});
+
 Route::get('/source/{source}/{feed?}', function ($source, Request $request, $feed = null) {
     $url = $request->input('url');
     if ($feed && $url) {

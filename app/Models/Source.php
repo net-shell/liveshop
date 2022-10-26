@@ -24,6 +24,11 @@ class Source extends Model
         return $this->apiDriver()->{$this->content_type}();
     }
 
+    public function getLocalApiUrlAttribute()
+    {
+        return route('source', ['source' => $this->slug]);
+    }
+
     public function fetchApiUrl()
     {
         return cache()->remember("api_response_{$this->api_url}", $this->apiCacheTime, function () {

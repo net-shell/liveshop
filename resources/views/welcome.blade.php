@@ -37,7 +37,7 @@
         </style>
     </head>
     <body>
-        <div class="flex-center h-full">
+        <div class="h-full flex-center">
             <div>
                 <code>LiveShop</code>
             </div>
