@@ -194,32 +194,32 @@
                     </a>
                     @endforeach
                 </nav>
-                <div class="flex-row">
+                <div class="flex-row" tabindex="0">
                     <div class="cats">
                         <template x-for="(cat, c1) in cats">
-                            <a class="btn" :class="{ 'rounded': cat === cats2 }" x-text="c1" x-on:click="cats2 = cat; cats3 = {}; prods = []; title = null;"></a>
+                            <a class="btn" :class="{ 'rounded': cat === cats2 }" x-text="c1" x-on:click="cats2 = cat; cats3 = {}; prods = []; title = null;" tabindex="-1"></a>
                         </template>
                     </div>
                     <div class="cats cat2" x-show="hasCats2()">
                         <template x-for="(cat, c2) in cats2">
-                            <a class="btn" :class="{ 'rounded': cat === cats3 }" x-text="c2" x-on:click="cats3 = cat; prods = []; title = null;"></a>
+                            <a class="btn" :class="{ 'rounded': cat === cats3 }" x-text="c2" x-on:click="cats3 = cat; prods = []; title = null;" tabindex="-1"></a>
                         </template>
                     </div>
                     <div class="cats cat3" x-show="hasCats3()">
                         <template x-for="(url, c3) in cats3">
-                            <a class="btn" :class="{ 'rounded': c3 === title }" x-text="c3" x-on:click="getProds(c3, url)"></a>
+                            <a class="btn" :class="{ 'rounded': c3 === title }" x-text="c3" x-on:click="getProds(c3, url)" tabindex="-1"></a>
                         </template>
                     </div>
                 </div>
             </div>
-            <div class="prods" x-show="!!prods.length">
+            <div class="prods" x-show="!!prods.length" tabindex="0">
                 <h3 class="title noselect">
                     <span x-text="title"></span>
                     (<b x-text="prods.length"></b>)
                 </h3>
                 <template x-for="prod in prods">
                     <div :class="{ 'rounded': expanded }" x-data="{ expanded: false }">
-                        <div class="flex-head" @click="expanded = !expanded">
+                        <div class="flex-head" @click="expanded = !expanded" tabindex="-1">
                             <div class="name">
                                 <b x-text="prod.name"></b>
                             </div>
