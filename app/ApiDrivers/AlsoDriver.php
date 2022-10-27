@@ -7,23 +7,48 @@ use DOMDocument;
 
 class AlsoDriver
 {
-    public $error;
-
     protected $dom;
 
-    public function __construct(protected Source $source)
+    public function __construct(protected $data)
     {
-        $xml = $source->fetchApiUrl();
         $this->dom = new DOMDocument;
-        $this->dom->loadXML($xml);
+    }
+
+    private function boot()
+    {
+        if (empty($this->data) || !$this->dom) return;
+
+        $this->dom->loadXML($this->data);
 
         $error = $this->dom->getElementsByTagName('error');
         if ($error && $error->item(0)) {
-            $this->error = $error->item(0)->nodeValue;
+            throw new \Exception($error->item(0)->nodeValue, 500);
         }
     }
 
+    private function cachedResponse($method)
+    {
+        $this->boot();
+        // TODO: Add caching of mapped model
+        $data = call_user_func([$this, $method]);
+    }
+
     public function categories()
+    {
+        return $this->cachedResponse('mapCategories');
+    }
+
+    public function products()
+    {
+        return $this->cachedResponse('mapProducts');
+    }
+
+    public function product()
+    {
+        return $this->cachedResponse('mapProduct');
+    }
+
+    protected function mapCategories()
     {
         $links = $this->dom->getElementsByTagName('link');
         $categories = [];
@@ -40,7 +65,7 @@ class AlsoDriver
         return $categories;
     }
 
-    public function products()
+    protected function mapProducts()
     {
         $items = $this->dom->getElementsByTagName('product');
         $products = [];
@@ -67,8 +92,7 @@ class AlsoDriver
         return $products;
     }
 
-    public function product()
+    protected function mapProduct()
     {
-
     }
 }

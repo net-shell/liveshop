@@ -12,24 +12,24 @@ class Source extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'slug', 'content_type', 'api_url'];
-    protected $apiCacheTime = 3600 * 24;
     protected $apiDriver;
 
     public function apiDriver()
     {
         if (!$this->apiDriver) {
-            $this->apiDriver = new AlsoDriver($this);
+            $this->apiDriver = new AlsoDriver($this->getApiResponse());
         }
         return $this->apiDriver;
     }
 
     public function apiData()
     {
-        $error = $this->apiDriver()->error;
-        if ($error) {
-            return compact('error');
+        $data = ['error' => $this->getApiResponse()];
+        try {
+            $data = call_user_func([$this->apiDriver(), $this->content_type]);
+        } catch (\Exception $e) {
         }
-        return $this->apiDriver()->{$this->content_type}();
+        return $data;
     }
 
     public function getLocalApiUrlAttribute()
@@ -37,10 +37,10 @@ class Source extends Model
         return route('source', ['source' => $this->slug]);
     }
 
-    public function fetchApiUrl()
+    public function getApiResponse()
     {
-        return cache()->remember("api_response_{$this->api_url}", $this->apiCacheTime, function () {
-            $response = Http::get($this->attributes['api_url']);
+        return cache()->rememberForever("api_response_{$this->api_url}", function () {
+            $response = Http::get($this->api_url);
             return $response->body();
         });
     }
